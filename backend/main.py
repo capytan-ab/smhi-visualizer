@@ -1,6 +1,6 @@
 from datetime import datetime
 from math import asin, cos, radians, sin, sqrt
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Optional, Set
 
 import httpx
 from fastapi import FastAPI, HTTPException, Query
@@ -28,8 +28,8 @@ class LightningMonthlyResponse(BaseModel):
     lat: float
     lon: float
     radius_km: Optional[float]
-    aggregation: Literal["count"]
     monthly_counts: Dict[str, int]
+    monthly_daily_probability: Dict[str, float]
 
 
 @app.get("/lightning/monthly", response_model=LightningMonthlyResponse)
@@ -37,11 +37,16 @@ async def get_lightning_monthly(
     year: int = Query(..., ge=2012, le=datetime.utcnow().year),
     lat: float = Query(..., ge=-90.0, le=90.0),
     lon: float = Query(..., ge=-180.0, le=180.0),
-    agg: Literal["count"] = "count",
     radius_km: Optional[float] = Query(25.0, gt=0, le=200),
 ):
     """
-    Returns the number of lightning strikes per month for a given year and location.
+    Returns lightning statistics per month for a given year and location.
+
+    For each calendar month this endpoint returns:
+    - `monthly_counts`: total number of lightning strikes within `radius_km`
+      of (`lat`, `lon`) during that month.
+    - `monthly_daily_probability`: the fraction of days in that month that had
+      at least one lightning strike within `radius_km` of (`lat`, `lon`).
 
     Data source: SMHI lightning open data API
     (`https://opendata-download-lightning.smhi.se/api.json`).
@@ -92,6 +97,10 @@ async def get_lightning_monthly(
         return resp.json()
 
     monthly_counts: Dict[str, int] = {f"{m:02d}": 0 for m in range(1, 13)}
+    monthly_days_with_strikes: Dict[str, Set[int]] = {
+        f"{m:02d}": set() for m in range(1, 13)
+    }
+    monthly_total_days: Dict[str, int] = {}
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         # Get all months for the selected year.
@@ -111,6 +120,7 @@ async def get_lightning_monthly(
             month_data = await fetch_json(client, month_url)
 
             days: List[Dict] = month_data.get("day") or []
+            monthly_total_days[month_key] = len(days)
             for day_entry in days:
                 try:
                     day_num = int(day_entry.get("key"))
@@ -138,12 +148,22 @@ async def get_lightning_monthly(
                             continue
 
                     monthly_counts[month_key] += 1
+                    monthly_days_with_strikes[month_key].add(day_num)
+
+    monthly_daily_probability: Dict[str, float] = {}
+    for month_key in monthly_counts.keys():
+        total_days = monthly_total_days.get(month_key, 0)
+        if total_days == 0:
+            monthly_daily_probability[month_key] = 0.0
+        else:
+            days_with_strikes = len(monthly_days_with_strikes[month_key])
+            monthly_daily_probability[month_key] = days_with_strikes / total_days
 
     return {
         "year": year,
         "lat": lat,
         "lon": lon,
         "radius_km": radius_km,
-        "aggregation": agg,
         "monthly_counts": monthly_counts,
+        "monthly_daily_probability": monthly_daily_probability,
     }
