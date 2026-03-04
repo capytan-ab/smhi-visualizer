@@ -32,6 +32,7 @@ The cloud coverage is also provided from a weather station, this station might b
 * Add streaming to avoid the appearance of long loading times, use a skeleton in the interface.
 * Add address suggestion in a menu.
 * Add Google Maps and not only use their Geocoding API to choose a location on the map instead of typing an address.
+* Add form validation with Zod.
 
 ## Failed functionality
 
