@@ -13,7 +13,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { submitAddress } from './action'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { useActionState, useEffect, useRef } from 'react'
+import { useActionState, useEffect, useRef, useTransition } from 'react'
 
 export default function Inputs() {
   const startYear = 2025
@@ -24,7 +24,11 @@ export default function Inputs() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [state, formAction, pending] = useActionState(submitAddress, undefined)
+  const [state, formAction, pendingAction] = useActionState(
+    submitAddress,
+    undefined,
+  )
+  const [isPending, startTransition] = useTransition()
 
   const searchParamsRef = useRef(searchParams)
 
@@ -33,25 +37,29 @@ export default function Inputs() {
   }, [searchParams])
 
   function changeYear(value: string) {
-    router.push(
-      `${pathname}?${new URLSearchParams({
-        ...Object.fromEntries(searchParams.entries()),
-        year: value,
-      })}`,
-    )
+    startTransition(() => {
+      router.push(
+        `${pathname}?${new URLSearchParams({
+          ...Object.fromEntries(searchParams.entries()),
+          year: value,
+        })}`,
+      )
+    })
   }
 
   useEffect(() => {
     if (!state || 'error' in state) return
 
-    router.push(
-      `${pathname}?${new URLSearchParams({
-        ...Object.fromEntries(searchParamsRef.current.entries()),
-        lat: state.lat.toString(),
-        lng: state.lng.toString(),
-        address: state.address,
-      })}`,
-    )
+    startTransition(() => {
+      router.push(
+        `${pathname}?${new URLSearchParams({
+          ...Object.fromEntries(searchParamsRef.current.entries()),
+          lat: state.lat.toString(),
+          lng: state.lng.toString(),
+          address: state.address ?? '',
+        })}`,
+      )
+    })
   }, [state, router, pathname])
 
   return (
@@ -87,10 +95,30 @@ export default function Inputs() {
             />
           </Field>
         </FieldGroup>
+        <FieldGroup className="flex flex-row gap-4">
+          <Field>
+            <FieldLabel htmlFor="lat">Latitude</FieldLabel>
+            <Input
+              id="lat"
+              name="lat"
+              placeholder="Latitude"
+              defaultValue={searchParams.get('lat') ?? undefined}
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="lng">Longitude</FieldLabel>
+            <Input
+              id="lng"
+              name="lng"
+              placeholder="Longitude"
+              defaultValue={searchParams.get('lng') ?? undefined}
+            />
+          </Field>
+        </FieldGroup>
       </FieldSet>
       <Field orientation="horizontal" className="mt-4">
-        <Button type="submit" disabled={pending}>
-          {pending && <Spinner />}
+        <Button type="submit" disabled={isPending || pendingAction}>
+          {isPending || pendingAction ? <Spinner /> : null}
           Submit
         </Button>
       </Field>
