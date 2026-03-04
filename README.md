@@ -18,10 +18,13 @@ The cloud coverage is also provided from a weather station, this station might b
 
 ## Improvements
 
+* Add type safety between backend and frontend.
+* Ability to customize radius for lightning strikes.
+* Show distance from chosen location to the weather station used for cloud coverage.
+
 ### Backend
 
 * Cache or download archived data to avoid the longer load times or potential outtages/rate limiting etc.
-* Add type safety between backend and frontend.
 
 ### Frontend
 
