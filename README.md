@@ -16,6 +16,20 @@ It did not work using `data.json` at the end, only `data.csv` worked. This threw
 
 The cloud coverage is also provided from a weather station, this station might be decommissioned or inactive and no longer provide data for the period you want to look at. The location that is provided have to check the closest station that has data for that period, and that might not be the closest station.
 
+## Improvements
+
+### Backend
+
+* Cache or download archived data to avoid the longer load times or potential outtages/rate limiting etc.
+
 ### Frontend
 
-Add streaming to avoid the appearance of long loading times, use a skeleton in the interface.
+* Add streaming to avoid the appearance of long loading times, use a skeleton in the interface.
+* Add Google Maps and not only use their Geocoding API to choose a location on the map instead of typing an address.
+
+## Failed functionality
+
+* Terraform is not tested with any real integrations.
+* No AI prognocies was implemented.
+* No testing.
+* No guidelines for AI, i.e. `.claude/CLAUDE.md`
