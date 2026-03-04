@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import {
   Card,
@@ -54,11 +55,11 @@ interface ChartBarMultipleProps {
 
 const chartConfig = {
   cloud: {
-    label: 'Cloud Coverage (%)',
+    label: 'Cloud Coverage',
     color: 'var(--chart-1)',
   },
   lightning: {
-    label: 'Lightning Probability (%)',
+    label: 'Lightning Probability',
     color: 'var(--chart-2)',
   },
 } satisfies ChartConfig
@@ -94,7 +95,33 @@ export function ChartBarMultiple({
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dashed" />}
+              content={
+                <ChartTooltipContent
+                  indicator="dashed"
+                  formatter={(value, name) => {
+                    const config = chartConfig[name as keyof typeof chartConfig]
+                    return (
+                      <>
+                        <div
+                          className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-(--color-bg)"
+                          style={
+                            {
+                              '--color-bg': `var(--color-${name})`,
+                            } as React.CSSProperties
+                          }
+                        />
+                        {config?.label}
+                        <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
+                          {value}
+                          <span className="font-normal text-muted-foreground">
+                            %
+                          </span>
+                        </div>
+                      </>
+                    )
+                  }}
+                />
+              }
             />
             <Bar dataKey="cloud" fill="var(--color-cloud)" radius={4} />
             <Bar dataKey="lightning" fill="var(--color-lightning)" radius={4} />
