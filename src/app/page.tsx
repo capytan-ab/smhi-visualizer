@@ -72,7 +72,7 @@ type CloudResult =
         }
       }
     }
-  | { error: string }
+  | { error: { msg: string }[] }
 
 type LightningResult =
   | {
@@ -111,7 +111,7 @@ type LightningResult =
         }
       }
     }
-  | { error: string }
+  | { error: { msg: string }[] }
 
 export default async function Home({
   searchParams,
@@ -149,14 +149,15 @@ export default async function Home({
           />
         )}
       {cloudResult && 'error' in cloudResult && (
-        <span className="text-destructive">
-          Cloud data error: {cloudResult.error}
-        </span>
+        <div className="text-destructive">
+          Cloud data error: {cloudResult.error.map((e) => e.msg).join(', ')}
+        </div>
       )}
       {lightningResult && 'error' in lightningResult && (
-        <span className="text-destructive">
-          Lightning data error: {lightningResult.error}
-        </span>
+        <div className="text-destructive">
+          Lightning data error:{' '}
+          {lightningResult.error.map((e) => e.msg).join(', ')}
+        </div>
       )}
     </main>
   )

@@ -23,7 +23,7 @@ import {
 
 export default function Inputs() {
   const startYear = 2025
-  const endYear = 1955
+  const endYear = 2012
   const length = startYear - endYear + 1
   const years = Array.from({ length }, (_, i) => startYear - i)
   const router = useRouter()
