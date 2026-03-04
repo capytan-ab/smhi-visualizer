@@ -13,7 +13,13 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { submitAddress } from './action'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { useActionState, useEffect, useRef, useTransition } from 'react'
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
 
 export default function Inputs() {
   const startYear = 2025
@@ -23,6 +29,7 @@ export default function Inputs() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [address, setAddress] = useState(searchParams.get('address') ?? '')
 
   const [state, formAction, pendingAction] = useActionState(
     submitAddress,
@@ -91,7 +98,8 @@ export default function Inputs() {
               id="address"
               name="address"
               placeholder="Address"
-              defaultValue={searchParams.get('address') ?? undefined}
+              defaultValue={address}
+              onChange={(e) => setAddress(e.target.value)}
             />
           </Field>
         </FieldGroup>
@@ -103,6 +111,7 @@ export default function Inputs() {
               name="lat"
               placeholder="Latitude"
               defaultValue={searchParams.get('lat') ?? undefined}
+              disabled={Boolean(address)}
             />
           </Field>
           <Field>
@@ -112,6 +121,7 @@ export default function Inputs() {
               name="lng"
               placeholder="Longitude"
               defaultValue={searchParams.get('lng') ?? undefined}
+              disabled={Boolean(address)}
             />
           </Field>
         </FieldGroup>
