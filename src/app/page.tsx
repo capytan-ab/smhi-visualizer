@@ -1,5 +1,6 @@
 import Inputs from './Inputs'
 import styles from './page.module.css'
+import { ChartBarMultiple } from '@/components/chart-bar-multiple'
 
 const BACKEND_URL = process.env.BACKEND_URL
 
@@ -141,12 +142,11 @@ export default async function Home({
         'data' in cloudResult &&
         lightningResult &&
         'data' in lightningResult && (
-          <div>
-            <h2>Cloud Data</h2>
-            <pre>{JSON.stringify(cloudResult.data, null, 2)}</pre>
-            <h2>Lightning Data</h2>
-            <pre>{JSON.stringify(lightningResult.data, null, 2)}</pre>
-          </div>
+          <ChartBarMultiple
+            cloudPct={cloudResult.data.monthly_avg_cloud_pct}
+            lightningProb={lightningResult.data.monthly_daily_probability}
+            year={cloudResult.data.year}
+          />
         )}
       {cloudResult && 'error' in cloudResult && (
         <span className="text-destructive">
