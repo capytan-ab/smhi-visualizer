@@ -21,6 +21,7 @@ The cloud coverage is also provided from a weather station, this station might b
 ### Backend
 
 * Cache or download archived data to avoid the longer load times or potential outtages/rate limiting etc.
+* Add type safety between backend and frontend.
 
 ### Frontend
 
