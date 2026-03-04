@@ -1,0 +1,15 @@
+# Copy this file to terraform.tfvars and fill in real values.
+# terraform.tfvars is gitignored — never commit secrets.
+
+aws_region          = "eu-north-1"
+app_name            = "smhi-visualizer"
+
+vercel_api_token    = "your-vercel-api-token"
+vercel_team_id      = ""   # leave empty for personal accounts
+
+google_maps_api_key = "your-google-maps-api-key"
+
+image_tag             = "latest"
+backend_cpu           = 256
+backend_memory        = 512
+backend_desired_count = 1
