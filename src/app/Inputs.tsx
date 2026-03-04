@@ -30,6 +30,9 @@ export default function Inputs() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [address, setAddress] = useState(searchParams.get('address') ?? '')
+  const [year, setYear] = useState(searchParams.get('year') ?? '')
+  const [lat, setLat] = useState(searchParams.get('lat') ?? '')
+  const [lng, setLng] = useState(searchParams.get('lng') ?? '')
 
   const [state, formAction, pendingAction] = useActionState(
     submitAddress,
@@ -44,6 +47,7 @@ export default function Inputs() {
   }, [searchParams])
 
   function changeYear(value: string) {
+    setYear(value)
     startTransition(() => {
       router.push(
         `${pathname}?${new URLSearchParams({
@@ -58,6 +62,9 @@ export default function Inputs() {
     if (!state || 'error' in state) return
 
     startTransition(() => {
+      setLat(state.lat.toString())
+      setLng(state.lng.toString())
+      setAddress(state.address ?? '')
       router.push(
         `${pathname}?${new URLSearchParams({
           ...Object.fromEntries(searchParamsRef.current.entries()),
@@ -78,7 +85,7 @@ export default function Inputs() {
             <Select
               name="year"
               onValueChange={(value) => changeYear(value)}
-              defaultValue={searchParams.get('year') ?? undefined}
+              value={year || undefined}
             >
               <SelectTrigger className="w-45" id="year">
                 <SelectValue placeholder="Year" />
@@ -98,7 +105,7 @@ export default function Inputs() {
               id="address"
               name="address"
               placeholder="Address"
-              defaultValue={address}
+              value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
           </Field>
@@ -110,7 +117,8 @@ export default function Inputs() {
               id="lat"
               name="lat"
               placeholder="Latitude"
-              defaultValue={searchParams.get('lat') ?? undefined}
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
               disabled={Boolean(address)}
             />
           </Field>
@@ -120,7 +128,8 @@ export default function Inputs() {
               id="lng"
               name="lng"
               placeholder="Longitude"
-              defaultValue={searchParams.get('lng') ?? undefined}
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
               disabled={Boolean(address)}
             />
           </Field>
