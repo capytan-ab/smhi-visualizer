@@ -25,6 +25,7 @@ The cloud coverage is also provided from a weather station, this station might b
 ### Backend
 
 * Cache or download archived data to avoid the longer load times or potential outtages/rate limiting etc.
+* `corrected-archive` only includes data from 2003 and lightning data is only from 2012 onwards. Downloading data for specific stations is required for older data.
 
 ### Frontend
 
