@@ -41,21 +41,18 @@ export default function Inputs() {
   const [isPending, startTransition] = useTransition()
 
   const searchParamsRef = useRef(searchParams)
+  const yearRef = useRef(year)
 
   useEffect(() => {
     searchParamsRef.current = searchParams
   }, [searchParams])
 
+  useEffect(() => {
+    yearRef.current = year
+  }, [year])
+
   function changeYear(value: string) {
     setYear(value)
-    startTransition(() => {
-      router.push(
-        `${pathname}?${new URLSearchParams({
-          ...Object.fromEntries(searchParams.entries()),
-          year: value,
-        })}`,
-      )
-    })
   }
 
   useEffect(() => {
@@ -71,6 +68,7 @@ export default function Inputs() {
           lat: state.lat.toString(),
           lng: state.lng.toString(),
           address: state.address ?? '',
+          year: yearRef.current,
         })}`,
       )
     })
